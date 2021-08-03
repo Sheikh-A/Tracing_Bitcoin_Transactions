@@ -38,24 +38,30 @@ class TXO:
     @classmethod
     def from_tx_hash(cls,tx_hash,n=0):
         tx = rpc_connection.getrawtransaction(tx_hash,True)
-        vout = tx.get("vout")
-        vout = vout[n]
-        amount = vout.get("value") * 100000000
-        owner = vout.get("scriptPubKey").get("addresses")[0]
-        time = datetime.fromtimestamp(tx.get("time"))
-        return TXO(tx_hash, n, amount, owner, time)
+        #use V.out to get tx
+        v_out = tx.get("vout")
+        #Get the array
+        v_out = v_out[n]
+        #Wallet Owner
+        wallet_owner = v_out.get("scriptPubKey").get("addresses")[0]
+        #Total Amount
+        total_amount = v_out.get("value") * 100000000
+        #date time
+        date_time = datetime.fromtimestamp(tx.get("time"))
+        #return all
+        return TXO(tx_hash, n, total_amount, wallet_owner, date_time)
 
 
     def get_inputs(self,d=1):
-        # tx = rpc_connection.getrawtransaction(self.tx_hash,True)
-        # vin = tx.get("vin")
-        # if d >= 1:
-        #     l = len(vin)
-        #     idx = 0
-        #     while idx < l:
-        #         current = vin[idx]
-        #         txo = TXO.from_tx_hash(current.get("txid"), current.get("vout"))
-        #         txo.get_inputs(d-1)
-        #         self.inputs.append(txo)
-        #         idx = idx + 1
+        tx = rpc_connection.getrawtransaction(self.tx_hash,True)
+        vin = tx.get("vin")
+        if d >= 1:
+            l = len(vin)
+            idx = 0
+            while idx < l:
+                current = vin[idx]
+                txo = TXO.from_tx_hash(current.get("txid"), current.get("vout"))
+                txo.get_inputs(d-1)
+                self.inputs.append(txo)
+                idx = idx + 1
 
