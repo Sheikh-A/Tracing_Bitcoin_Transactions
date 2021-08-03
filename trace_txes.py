@@ -54,14 +54,24 @@ class TXO:
 
     def get_inputs(self,d=1):
         tx = rpc_connection.getrawtransaction(self.tx_hash,True)
-        vin = tx.get("vin")
+        #Vin arg
+        v_in = tx.get("vin")
+        
         if d >= 1:
-            l = len(vin)
-            idx = 0
-            while idx < l:
-                current = vin[idx]
-                txo = TXO.from_tx_hash(current.get("txid"), current.get("vout"))
-                txo.get_inputs(d-1)
-                self.inputs.append(txo)
-                idx = idx + 1
+            #Set equal to 0
+            id_var_counter = 0
+            #Length
+            vin_length = len(v_in)
+            #use While loop
+            while id_var_counter < vin_length:
+                #Get the array value
+                d_value = v_in[id_var_counter]
+                #get the transactions value
+                transaction = TXO.from_tx_hash(d_value.get("txid"), d_value.get("vout"))
+                #Get inputs
+                transaction.get_inputs(d-1)
+                #append inputs
+                self.inputs.append(transaction)
+                #increment loop counter
+                id_var_counter += 1
 
