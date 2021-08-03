@@ -37,10 +37,25 @@ class TXO:
 
     @classmethod
     def from_tx_hash(cls,tx_hash,n=0):
-        pass
-        #YOUR CODE HERE
+        tx = rpc_connection.getrawtransaction(tx_hash,True)
+        vout = tx.get("vout")
+        vout = vout[n]
+        amount = vout.get("value") * 100000000
+        owner = vout.get("scriptPubKey").get("addresses")[0]
+        time = datetime.fromtimestamp(tx.get("time"))
+        return TXO(tx_hash, n, amount, owner, time)
+
 
     def get_inputs(self,d=1):
-        pass
-        #YOUR CODE HERE
+        tx = rpc_connection.getrawtransaction(self.tx_hash,True)
+        vin = tx.get("vin")
+        if d >= 1:
+            l = len(vin)
+            idx = 0
+            while idx < l:
+                current = vin[idx]
+                txo = TXO.from_tx_hash(current.get("txid"), current.get("vout"))
+                txo.get_inputs(d-1)
+                self.inputs.append(txo)
+                idx = idx + 1
 
