@@ -60,7 +60,7 @@ class TXO:
         if d >= 1:
             #Set equal to 0
             id_var_counter = 0
-            #Length
+            #Length of vin
             vin_length = len(v_in)
             #use While loop
             while id_var_counter < vin_length:
